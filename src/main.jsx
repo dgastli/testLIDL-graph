@@ -1,50 +1,51 @@
-var CodeBlock = require('./codeBlock.js');
-var Utils = require("./iiiUtils.js");
+var CodeBlock = require('./CodeBlock.jsx');
+var CodeBlockViewer = require('./CodeBlockViewer.jsx');
 var React = require('react');
-var VisGraphView = require("./visGraphView.js");
+var iii = require('iii');
 
 
-var timer;
+class Main extends React.Component {
 
-function maybeupdate() {
-  updateDelayPassed=false;
-  clearTimeout(timer);
-  timer=setTimeout(update,500);
-}
+  constructor(props) {
+    super(props);
+    this.state={modelCode:"",errorCode:"", };
+  }
 
-function update() {
-  try{
-    var content = Utils.fromString(document.getElementById("theinputfromuser").value);
-
-    var graphvis = {nodes: [],edges: []};
-    Utils.createGraph(graphvis,content,0);
-
-    React.render(<CodeBlock interaction={content} />, document.getElementById('editor'));
-    
+  onCodeChange(newCode) {
+    this.evaluateCode(newCode);
+  }
 
 
-  }catch(error){
 
+  evaluateCode(code){
+    try {
+      var newModelCode = iii.parser.parse(code,{startRule:"interaction"});
+      this.setState({errorCode:""});
+
+      console.log("parsedCode =",JSON.stringify(newModelCode));
+      this.setState({modelCode:newModelCode});
+
+
+
+
+    } catch (errorMessage) {
+      this.setState({errorCode:errorMessage});
+      console.log(errorMessage);
+    }
+  }
+
+
+
+
+  render() {
+    return (
+      <div className="Main">
+        <CodeBlock   errorCode={this.state.errorCode}  modelCode={this.state.modelCode} code={this.state.code} evaluateCode={this.evaluateCode.bind(this)}  onCodeChange={this.onCodeChange.bind(this)}   />
+        <CodeBlockViewer modelCode={this.state.modelCode}/>
+      </div>
+    );
   }
 }
 
 
-function afterLoad(){
-  // document.getElementById('updatebutton').addEventListener('click', update);
-  document.getElementById('theinputfromuser').addEventListener('input',maybeupdate);
-
-  update();
-
-}
-
-
-if(window.onload) {
-        var curronload = window.onload;
-        var newonload = function() {
-            curronload();
-            afterLoad();
-        };
-        window.onload = newonload;
-    } else {
-        window.onload = afterLoad;
-    }
+React.render(<Main/>, document.getElementById("main"));

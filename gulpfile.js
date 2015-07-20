@@ -1,77 +1,78 @@
 var gulp = require('gulp');
-var browserify = require('gulp-browserify');
+var del = require('del');
+var stylus = require('gulp-stylus');
+var sourcemaps = require('gulp-sourcemaps');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
-var react = require('gulp-react');
-var peg = require('gulp-peg');
-var clean = require('gulp-clean');
-var less = require('gulp-less');
-var mocha = require('gulp-mocha');
-var coffee = require('gulp-coffee');
+var gutil = require('gulp-util');
+//var jest = require('gulp-jest');
+
+gulp.task('default',['js','html','css']);
+
+/*
+gulp.task('jest', function () {
+    return gulp.src('./').pipe(jest({
+        // scriptPreprocessor: "./spec/support/preprocessor.js",
+        unmockedModulePathPatterns: [
+            "node_modules/react"
+        ],
+        // testDirectoryName: "spec",
+        testPathIgnorePatterns: [
+            "node_modules",
+            "dist"
+        ],
+        moduleFileExtensions: [
+            "js",
+            "json",
+            "react"
+        ],
+        collectCoverage:true
+    }));
+});*/
 
 
-var watching = false;
-function onError(err) {
-  if(watching) {
-    this.emit('end');
-  }
-  else {
-    console.log(err.toString());
-  }
-}
 
-
-gulp.task('default', ['all']);
-
-gulp.task('all',['browserify','styles','libs','test']);
-
-gulp.task('browserify', ['bin'], function() {
-  gulp.src('bin/main.js')
-    .pipe(browserify({insertGlobals: true,debug: true,}))
-    .pipe(uglify())
-    .pipe(gulp.dest('dist'))
+gulp.task('js', function () {
+  // set up the browserify instance on a task basis
+  var b = browserify({
+    entries: 'src/main.jsx',
+    insertGlobals : true,
+          debug : true,
+          extension: [ "jsx" ],
+          transform: [
+            ["reactify", {"es6": true}]
+          ]
+  });
+  return b.bundle()
+    .pipe(source('main.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({loadMaps: true}))
+        // Add transformation tasks to the pipeline here.
+        // .pipe(uglify())
+        .on('error', gutil.log)
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('bin', function() {
-  gulp.src('src/**/*.jsx')
-    .pipe(react())
-    .pipe(gulp.dest('bin'));
-  gulp.src('src/**/*.js')
-    .pipe(gulp.dest('bin'));
-  gulp.src('src/**/*.mem')
-    .pipe(gulp.dest('bin'));
-  gulp.src('src/**/*.pegjs')
-    .pipe(peg())
-    .pipe(gulp.dest('bin'));
-  gulp.src('src/**/*.coffee')
-    .pipe(coffee())
-    .on('error', onError)
-    .pipe(gulp.dest('bin'));
+gulp.task('html', function () {
+  return gulp.src('src/main.html')
+        .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('styles',function() {
-  gulp.src('src/main.less')
-  .pipe(less())
-  .pipe(gulp.dest('dist'));
+gulp.task('css', function () {
+  gulp.src('src/main.styl')
+    .pipe(sourcemaps.init())
+    .pipe(stylus())
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('libs',function() {
-  gulp.src('lib/**/*.*')
-    .pipe(gulp.dest('dist'));
-});
 
-gulp.task('clean',function() {
-  gulp.src('bin/**/*.js',{read:false})
-    .pipe(clean());
-});
-
-gulp.task ('test',['bin'],function() {
-  gulp.src('test/**/*.js')
-    .pipe(mocha({reporter:'spec'}))
-    .on("error",onError);
-});
-
-gulp.task('watch',function() {
-  watching=true;
-  gulp.watch('src/**/*.*',['all','test']);
-  gulp.watch('test/**/*.*',['test']);
+gulp.task('clean', function (cb) {
+  del([
+    'dist',
+    'build',
+  ], cb);
 });
