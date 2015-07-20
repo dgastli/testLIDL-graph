@@ -41,7 +41,7 @@ class Main extends React.Component {
     return (
       <div className="Main">
         <CodeBlock   errorCode={this.state.errorCode}  modelCode={this.state.modelCode} code={this.state.code} evaluateCode={this.evaluateCode.bind(this)}  onCodeChange={this.onCodeChange.bind(this)}   />
-        <CodeBlockViewer modelCode={this.state.modelCode}/>
+        <CodeBlockViewer interaction={this.state.modelCode} />
       </div>
     );
   }
