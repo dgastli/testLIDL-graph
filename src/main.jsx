@@ -1,49 +1,32 @@
-var CodeBlock = require('./CodeBlock.jsx');
+// var CodeBlock = require('./CodeBlock.jsx');
 var CodeBlockViewer = require('./CodeBlockViewer.jsx');
 var React = require('react');
-var iii = require('iii');
+
+
+var interactionToShow = {
+  type:"InteractionSimple",
+  operator:"when$then$",
+  operand:[{
+    type:"InteractionSimple",
+    operator:"a",
+    operand:[]
+  },{
+    type:"InteractionSimple",
+    operator:"b",
+    operand:[]
+  }]
+};
+
 
 
 class Main extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state={modelCode:"",errorCode:"", };
   }
-
-  onCodeChange(newCode) {
-    this.evaluateCode(newCode);
-  }
-
-
-
-  evaluateCode(code){
-    try {
-      var newModelCode = iii.parser.parse(code,{startRule:"interaction"});
-      this.setState({errorCode:""});
-
-      console.log("parsedCode =",JSON.stringify(newModelCode));
-      this.setState({modelCode:newModelCode});
-
-
-
-
-    } catch (errorMessage) {
-      this.setState({errorCode:errorMessage});
-      console.log(errorMessage);
-    }
-  }
-
-
-
 
   render() {
-    return (
-      <div className="Main">
-        <CodeBlock   errorCode={this.state.errorCode}  modelCode={this.state.modelCode} code={this.state.code} evaluateCode={this.evaluateCode.bind(this)}  onCodeChange={this.onCodeChange.bind(this)}   />
-        <CodeBlockViewer interaction={this.state.modelCode} />
-      </div>
-    );
+    return (<CodeBlockViewer interaction={interactionToShow}/>);
   }
 }
 
