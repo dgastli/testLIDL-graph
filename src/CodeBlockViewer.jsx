@@ -1,6 +1,7 @@
 var React = require('react');
 var _ = require('lodash');
 var Utils = require('./iiiUtils.js');
+var Input = require('./fitInput.jsx');
 
 class CodeBlockViewer extends React.Component {
 
@@ -19,7 +20,7 @@ class CodeBlockViewer extends React.Component {
         operandIndex = operandIndex + 1;
         return ( <CodeBlockViewer key={n} interaction={this.props.interaction.operand[operandIndex]} >  </CodeBlockViewer>);
       } else {
-        return <span className={"codeBlockSpan"} key={n}> {x} </span>
+        return <Input className={"codeBlockSpan"} key={n} value={x}>  </Input>
       }
     }.bind(this));
     // [<span>"when"<span>,<CodeBlockViewer/>,<span>"then"<span>,<CodeBlockViewer/>]
