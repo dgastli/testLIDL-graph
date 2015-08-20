@@ -1,20 +1,11 @@
 
+var Definitions = require('./iiiDefinitions.js');
 replaceAll = function(string,search, replace)
 {
-  var s = "My String";
-s = s.replace(/String$/, "New String");
-console.log(s)// alerts "My New String"
-console.log("search ", search);
-console.log("string ", string);
-console.log("replace ", replace);
+
   return string.replace(new RegExp('[' + search + ']', 'g'), replace);
 }
 module.exports.replaceAll = replaceAll;
-
-
-
-
-
 
 
 

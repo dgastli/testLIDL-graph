@@ -5,8 +5,14 @@ var Input = require('./fitInput.jsx');
 
 class CodeBlockViewer extends React.Component {
 
-  render() {
 
+  interactionCodeChanged(e){
+    console.log("interactionCodeChanged");
+    this.props.onInteractionCodeChange(e.target.value);
+  }
+
+  render() {
+    console.log("nouveau render");
     var content = this.props.interaction.operator;
     // "when$then$"
     content = Utils.replaceAll(content,"$","_$_");
@@ -25,7 +31,8 @@ class CodeBlockViewer extends React.Component {
     }.bind(this));
     // [<span>"when"<span>,<CodeBlockViewer/>,<span>"then"<span>,<CodeBlockViewer/>]
 
-    return <div className={"codeBlock"}>{content}</div>;
+
+    return <div className={"codeBlock"}  onChange={this.interactionCodeChanged.bind(this)}>{content} </div>;
 
 //     var cont=[];
 //     var n = 0;
@@ -102,5 +109,8 @@ class CodeBlockViewer extends React.Component {
 //
 // CodeBlock.defaultProps =  {errorCode:"",code:"(    Coucou   ( Bob ), il est  ( (13) heures (27) minutes )  )",modelCode:""};
 
+CodeBlockViewer.propTypes = {interactionCode:React.PropTypes.string,};
+
+CodeBlockViewer.defaultProps =  {interactionCode:"(    Coucou   ( Bob ), il est  ( (13) heures (27) minutes )  )",};
 
 module.exports = CodeBlockViewer;
